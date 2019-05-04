@@ -69,6 +69,8 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
     VectorXd y = z - h;
 
+    // Normalize angle
+    // Ref: https://knowledge.udacity.com/questions/16645
     while (y[1] < -M_PI) y[1] += 2 * M_PI;
     while (y[1] > M_PI) y[1] -= 2 * M_PI;
 

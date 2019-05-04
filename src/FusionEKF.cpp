@@ -38,12 +38,12 @@ FusionEKF::FusionEKF() {
    * initialize variables and matrices (x, F, H_laser, H_jacobian, P, etc.)
    */
   H_laser_ << 1, 0, 0, 0,
-  			0, 1, 0, 0;
+              0, 1, 0, 0;
   
   // Reference from Lesson.
   Hj_ << 1, 1, 0, 0,
-  		1, 1, 0, 0,
-  		1, 1, 1, 1;
+         1, 1, 0, 0,
+         1, 1, 1, 1;
 }
 
 /**
@@ -94,6 +94,17 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // done initializing, no need to predict or update
     is_initialized_ = true;
     
+    ekf_.F_ = MatrixXd(4, 4);
+    ekf_.F_ << 1, 0, 1, 0,
+               0, 1, 0, 1,
+               0, 0, 1, 0,
+               0, 0, 0, 1;
+    
+    ekf_.P_ = MatrixXd(4, 4);
+    ekf_.P_ << 1, 0, 0, 0,
+               0, 1, 0, 0,
+               0, 0, 1000, 0,
+               0, 0, 0, 1000;
     // Initialize previous timestamp with current timestamp
     previous_timestamp_ = measurement_pack.timestamp_;
     
@@ -126,12 +137,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   ekf_.Q_ = MatrixXd(4, 4);
   ekf_.Q_ << delta_t_4 / 4 * noise_ax, 0, delta_t_3 / 2 * noise_ax, 0,
-  0, delta_t_4 / 4 * noise_ay, 0, delta_t_3 / 2 * noise_ay,
-  delta_t_3 / 2 * noise_ax, 0, delta_t_2*noise_ax, 0,
-  0, delta_t_3 / 2 * noise_ay, 0, delta_t_2*noise_ay;
+             0, delta_t_4 / 4 * noise_ay, 0, delta_t_3 / 2 * noise_ay,
+             delta_t_3 / 2 * noise_ax, 0, delta_t_2*noise_ax, 0,
+             0, delta_t_3 / 2 * noise_ay, 0, delta_t_2*noise_ay;
 
   ekf_.Predict();
-  
+
   /**
    * Update
    */
